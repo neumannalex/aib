@@ -92,31 +92,22 @@ $ImgCustomParams01 = @{
 $Customizer01 = New-AzImageBuilderCustomizerObject @ImgCustomParams01
 
 # Add another customization to image builder
-# $ImgCustomParams02 = @{
-#     FileCustomizer = $true
-#     CustomizerName = 'downloadBuildArtifacts'
-#     Destination = 'c:\\buildArtifacts\\index.html'
-#     SourceUri = 'https://raw.githubusercontent.com/azure/azvmimagebuilder/master/quickquickstarts/exampleArtifacts/buildArtifacts/index.html'
-#   }
-# $Customizer02 = New-AzImageBuilderCustomizerObject @ImgCustomParams02
+$ImgCustomParams02 = @{
+    FileCustomizer = $true
+    CustomizerName = 'downloadBuildArtifacts'
+    Destination = 'c:\\buildArtifacts\\index.html'
+    SourceUri = 'https://raw.githubusercontent.com/azure/azvmimagebuilder/master/quickquickstarts/exampleArtifacts/buildArtifacts/index.html'
+  }
+$Customizer02 = New-AzImageBuilderCustomizerObject @ImgCustomParams02
 
 # Install Chocolatey
 $ImgCustomParams03 = @{
   PowerShellCustomizer = $true
-  CustomizerName = 'installChoco'
+  CustomizerName = 'installSoftware'
   RunElevated = $true
-  Inline = @("Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))")
+  ScriptUri = 'https://github.com/neumannalex/aib/blob/master/InstallSoftware.ps1'
 }
 $Customizer03 = New-AzImageBuilderCustomizerObject @ImgCustomParams03
-
-# Install VSCode, TortoiseSVN
-# $ImgCustomParams04 = @{
-#   PowerShellCustomizer = $true
-#   CustomizerName = 'installVsCodeAndTortoiseSvn'
-#   RunElevated = $true
-#   Inline = @("choco install vscode", "choco install tortoisesvn")
-# }
-# $Customizer04 = New-AzImageBuilderCustomizerObject @ImgCustomParams04
 
 # Create image template
 $ImgTemplateParams = @{
@@ -124,7 +115,7 @@ $ImgTemplateParams = @{
     ResourceGroupName = $imageResourceGroup
     Source = $srcPlatform
     Distribute = $disSharedImg
-    Customize = $Customizer01, $Customizer03
+    Customize = $Customizer01, $Customizer02, $Customizer03
     Location = $location
     UserAssignedIdentityId = $identityNameResourceId
   }
